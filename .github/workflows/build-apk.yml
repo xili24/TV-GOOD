@@ -27,7 +27,21 @@ jobs:
         run: |
           cat v2_patch_chunks/*.b64 | base64 -d | gzip -d > tvgood-v2.patch
           cd source
+          set +e
           patch -p5 < ../tvgood-v2.patch
+          PATCH_RC=$?
+          set -e
+          if [ "$PATCH_RC" -ne 0 ]; then
+            echo "Patch returned $PATCH_RC; checking rejects..."
+            find . -name '*.rej' -print
+            if find . -name '*.rej' ! -path './README.md.rej' | grep -q .; then
+              echo "Code patch reject detected"
+              exit 1
+            fi
+            test -f README.md.rej
+            rm -f README.md.rej
+          fi
+          test -f app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
 
       - uses: actions/setup-java@v4
         with:
