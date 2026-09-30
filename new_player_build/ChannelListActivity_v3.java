@@ -41,21 +41,21 @@ public class ChannelListActivity extends Activity {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(Color.rgb(7, 10, 15));
-        root.setPadding(dp(28), dp(18), dp(28), dp(18));
+        root.setPadding(dp(42), dp(28), dp(42), dp(30));
 
         TextView header = new TextView(this);
         header.setText("TRIO TV   •   " + AppSession.channels.size() + " KANALE");
         header.setTextColor(Color.WHITE);
-        header.setTextSize(24);
+        header.setTextSize(26);
         header.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(0, 0, 0, dp(12));
+        header.setPadding(dp(8), 0, 0, dp(22));
         root.addView(header, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         list = new ListView(this);
         list.setBackgroundColor(Color.rgb(7, 10, 15));
-        list.setDividerHeight(dp(4));
+        list.setDividerHeight(dp(10));
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         list.setFocusable(true);
         list.setFocusableInTouchMode(true);
@@ -81,14 +81,14 @@ public class ChannelListActivity extends Activity {
                 String number = String.format("%03d", position + 1);
                 v.setText((selected ? "▶  " : "    ") + number + "   " + names.get(position));
                 v.setTextColor(Color.WHITE);
-                v.setTextSize(selected ? 22 : 20);
+                v.setTextSize(selected ? 23 : 21);
                 v.setTypeface(Typeface.DEFAULT, selected ? Typeface.BOLD : Typeface.NORMAL);
                 v.setGravity(Gravity.CENTER_VERTICAL);
-                v.setPadding(dp(22), dp(6), dp(18), dp(6));
-                v.setMinHeight(dp(58));
+                v.setPadding(dp(28), dp(14), dp(22), dp(14));
+                v.setMinHeight(dp(76));
                 v.setBackgroundColor(selected
                         ? Color.rgb(28, 105, 225)
-                        : Color.rgb(18, 25, 35));
+                        : Color.rgb(22, 31, 43));
                 return v;
             }
         };
