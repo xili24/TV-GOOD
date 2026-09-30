@@ -21,6 +21,11 @@ jobs:
           unzip -q new-player.zip -d unpacked
           test -f unpacked/TV_PLAYER_NEW/settings.gradle.kts
 
+      - name: Fix Java URL encoder compatibility
+        run: |
+          sed -i 's/URLEncoder.encode(username, StandardCharsets.UTF_8.name())/URLEncoder.encode(username, StandardCharsets.UTF_8)/' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/XtreamClient.java
+          sed -i 's/URLEncoder.encode(password, StandardCharsets.UTF_8.name())/URLEncoder.encode(password, StandardCharsets.UTF_8)/' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/XtreamClient.java
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
