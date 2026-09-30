@@ -5,7 +5,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'smart_v3_chunks/**'
+      - 'smart_patch/**'
       - '.github/workflows/build-apk.yml'
 
 jobs:
@@ -14,14 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Reconstruct TV GOOD Smart UI
+      - name: Reconstruct base project
         run: |
-          cat smart_v3_chunks/*.b64 | base64 -d > tvgood-smart.zip
+          cat project_chunks/*.b64 | base64 -d > tvgood-base.zip
           mkdir source
-          unzip -q tvgood-smart.zip -d source
+          unzip -q tvgood-base.zip -d source
           test -f source/settings.gradle.kts
           test -f source/app/build.gradle.kts
-          grep -q '2.1.0-preview' source/app/build.gradle.kts
+
+      - name: Apply Smart IPTV behavior patch
+        run: |
+          cat smart_patch/*.b64 | base64 -d | gzip -d > smart-v3.patch
+          cd source
+          patch -p1 < ../smart-v3.patch
+          test -f app/src/main/java/com/tvgood/app/model/EpgNow.java
+          grep -q '2.1.0-preview' app/build.gradle.kts
 
       - uses: actions/setup-java@v4
         with:
@@ -44,10 +51,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_SMART_UI_PREVIEW.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_SMART_STYLE_v3.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TV-GOOD-SMART-UI-PREVIEW
-          path: TV_GOOD_SMART_UI_PREVIEW.apk
+          name: TV-GOOD-SMART-STYLE-v3
+          path: TV_GOOD_SMART_STYLE_v3.apk
           if-no-files-found: error
