@@ -1,0 +1,50 @@
+name: Build New TrioTV Player APK
+
+on:
+  push:
+    branches: [ new-tv-player-triotv ]
+    paths:
+      - 'new_player_build/**'
+      - '.github/workflows/build-new-triotv-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct source
+        run: |
+          cat new_player_build/source_*.b64 | base64 -d > new-player.zip
+          mkdir unpacked
+          unzip -q new-player.zip -d unpacked
+          test -f unpacked/TV_PLAYER_NEW/settings.gradle.kts
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Android SDK
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Build debug APK
+        working-directory: unpacked/TV_PLAYER_NEW
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Rename APK
+        run: cp unpacked/TV_PLAYER_NEW/app/build/outputs/apk/debug/app-debug.apk TRIO_TV_PLAYER_TEST.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TRIO-TV-PLAYER-TEST
+          path: TRIO_TV_PLAYER_TEST.apk
+          if-no-files-found: error
