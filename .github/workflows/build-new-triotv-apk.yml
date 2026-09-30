@@ -26,6 +26,9 @@ jobs:
           sed -i 's/URLEncoder.encode(username, StandardCharsets.UTF_8.name())/URLEncoder.encode(username, StandardCharsets.UTF_8)/' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/XtreamClient.java
           sed -i 's/URLEncoder.encode(password, StandardCharsets.UTF_8.name())/URLEncoder.encode(password, StandardCharsets.UTF_8)/' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/XtreamClient.java
           sed -i 's/android:hintTextColor=/android:textColorHint=/g' unpacked/TV_PLAYER_NEW/app/src/main/res/layout/activity_login.xml
+          sed -i '/adapter.notifyDataSetChanged();/d' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/ChannelListActivity.java
+          sed -i '/list.setItemChecked(AppSession.currentIndex, true);/d' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/ChannelListActivity.java
+          sed -i 's/android:fastScrollEnabled="true"/android:fastScrollEnabled="false"/' unpacked/TV_PLAYER_NEW/app/src/main/res/layout/activity_channels.xml
 
       - uses: actions/setup-java@v4
         with:
