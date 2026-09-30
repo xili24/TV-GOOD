@@ -10,6 +10,7 @@ on:
       - 'performance_v5/**'
       - 'compact_menu_v6/**'
       - 'groups_v7/**'
+      - 'vod_v8/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -71,6 +72,16 @@ jobs:
           grep -q 'GROUP_PAGE_SIZE = 13' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           grep -q 'updateGroupScroll' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
 
+      - name: Apply VOD movies v8
+        run: |
+          cat vod_v8/*.b64 | base64 -d | gzip -d > vod-v8.patch
+          cd source
+          patch -p1 < ../vod-v8.patch
+          grep -q '2.6.0-vod-preview' app/build.gradle.kts
+          grep -q 'vodCategories' app/src/main/java/com/tvgood/app/net/XtreamClient.java
+          grep -q 'Movies / VOD' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          test -f app/src/main/java/com/tvgood/app/model/VodItem.java
+
       - name: Apply Xili TV branding
         run: |
           mkdir -p source/app/src/main/res/drawable-nodpi
@@ -85,13 +96,13 @@ jobs:
           test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
           test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
 
-      - name: Package final v7 source
-        run: zip -qr XILI_TV_V7_SOURCE.zip source
+      - name: Package final v8 source
+        run: zip -qr XILI_TV_V8_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-V7-SOURCE
-          path: XILI_TV_V7_SOURCE.zip
+          name: XILI-TV-V8-SOURCE
+          path: XILI_TV_V8_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -115,10 +126,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_GROUPS_v7.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_VOD_v8.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-GROUPS-v7
-          path: XILI_TV_GROUPS_v7.apk
+          name: XILI-TV-VOD-v8
+          path: XILI_TV_VOD_v8.apk
           if-no-files-found: error
