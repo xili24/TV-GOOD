@@ -6,6 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'smart_patch/**'
+      - 'video_ref_patch/**'
       - '.github/workflows/build-apk.yml'
 
 jobs:
@@ -30,6 +31,14 @@ jobs:
           test -f app/src/main/java/com/tvgood/app/model/EpgNow.java
           grep -q '2.1.0-preview' app/build.gradle.kts
 
+      - name: Apply uploaded-video reference patch
+        run: |
+          cat video_ref_patch/*.b64 | base64 -d | gzip -d > video-ref.patch
+          cd source
+          patch -p1 < ../video-ref.patch
+          grep -q '2.2.0-video-ref' app/build.gradle.kts
+          grep -q 'Channels' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -51,10 +60,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_SMART_STYLE_v3.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_VIDEO_REFERENCE_v4.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TV-GOOD-SMART-STYLE-v3
-          path: TV_GOOD_SMART_STYLE_v3.apk
+          name: TV-GOOD-VIDEO-REFERENCE-v4
+          path: TV_GOOD_VIDEO_REFERENCE_v4.apk
           if-no-files-found: error
