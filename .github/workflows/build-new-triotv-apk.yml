@@ -30,6 +30,10 @@ jobs:
           sed -i '/list.setItemChecked(AppSession.currentIndex, true);/d' unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/ChannelListActivity.java
           sed -i 's/android:fastScrollEnabled="true"/android:fastScrollEnabled="false"/' unpacked/TV_PLAYER_NEW/app/src/main/res/layout/activity_channels.xml
 
+      - name: Apply safe channel list v3
+        run: |
+          cp new_player_build/ChannelListActivity_v3.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/ChannelListActivity.java
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
