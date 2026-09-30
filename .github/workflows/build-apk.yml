@@ -82,5 +82,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: XILI-TV-VIDEO-STYLE-v4
-          path: TV_GOOD_VIDEO_STYLE_v4.apk
+          path: XILI_TV_VIDEO_STYLE_v4.apk
           if-no-files-found: error
