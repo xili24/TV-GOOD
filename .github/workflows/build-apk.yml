@@ -5,7 +5,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'project_v2.b64'
+      - 'smart_v3_chunks/**'
       - '.github/workflows/build-apk.yml'
 
 jobs:
@@ -14,14 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Reconstruct TV GOOD v2
+      - name: Reconstruct TV GOOD Smart UI
         run: |
-          base64 -d project_v2.b64 > tvgood-v2.zip
+          cat smart_v3_chunks/*.b64 | base64 -d > tvgood-smart.zip
           mkdir source
-          unzip -q tvgood-v2.zip -d source
+          unzip -q tvgood-smart.zip -d source
           test -f source/settings.gradle.kts
           test -f source/app/build.gradle.kts
-          grep -q "2.0.0-preview1" source/app/build.gradle.kts
+          grep -q '2.1.0-preview' source/app/build.gradle.kts
 
       - uses: actions/setup-java@v4
         with:
@@ -44,10 +44,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_v2_preview.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_SMART_UI_PREVIEW.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TV-GOOD-v2-Preview
-          path: TV_GOOD_v2_preview.apk
+          name: TV-GOOD-SMART-UI-PREVIEW
+          path: TV_GOOD_SMART_UI_PREVIEW.apk
           if-no-files-found: error
