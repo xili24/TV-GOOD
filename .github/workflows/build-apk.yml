@@ -85,6 +85,15 @@ jobs:
           test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
           test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
 
+      - name: Package final v7 source
+        run: zip -qr XILI_TV_V7_SOURCE.zip source
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XILI-TV-V7-SOURCE
+          path: XILI_TV_V7_SOURCE.zip
+          if-no-files-found: error
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
