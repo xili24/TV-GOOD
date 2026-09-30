@@ -6,7 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'smart_patch/**'
-      - 'vertical_patch/**'
+      - 'vertical_patch2/**'
       - '.github/workflows/build-apk.yml'
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Apply uploaded-video vertical UI
         run: |
-          cat vertical_patch/*.b64 | base64 -d | gzip -d > vertical-v4.patch
+          cat vertical_patch2/*.b64 | base64 -d | gzip -d > vertical-v4.patch
           cd source
           patch -p1 < ../vertical-v4.patch
           grep -q '2.2.0-video-preview' app/build.gradle.kts
