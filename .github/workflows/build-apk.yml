@@ -7,6 +7,7 @@ on:
     paths:
       - 'smart_patch/**'
       - 'vertical_patch2/**'
+      - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
 jobs:
@@ -41,6 +42,20 @@ jobs:
           grep -q 'Favourite' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           grep -q 'Groups' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
 
+      - name: Apply Xili TV branding
+        run: |
+          mkdir -p source/app/src/main/res/drawable-nodpi
+          base64 -d xili_brand/icon.b64 > source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
+          base64 -d xili_brand/banner.b64 > source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
+          sed -i 's#android:icon="@drawable/ic_tvgood"#android:icon="@drawable/ic_xili_tv"#' source/app/src/main/AndroidManifest.xml
+          sed -i 's#android:banner="@drawable/tv_banner"#android:banner="@drawable/xili_tv_banner"#' source/app/src/main/AndroidManifest.xml
+          sed -i 's#android:label="TV GOOD"#android:label="@string/app_name"#' source/app/src/main/AndroidManifest.xml
+          sed -i 's#<string name="app_name">TV GOOD</string>#<string name="app_name">Xili TV</string>#' source/app/src/main/res/values/strings.xml
+          sed -i 's/"TV GOOD"/"Xili TV"/g' source/app/src/main/java/com/tvgood/app/ui/LoginActivity.java
+          grep -q 'Xili TV' source/app/src/main/res/values/strings.xml
+          test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
+          test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -62,10 +77,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk TV_GOOD_VIDEO_STYLE_v4.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_VIDEO_STYLE_v4.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TV-GOOD-VIDEO-STYLE-v4
+          name: XILI-TV-VIDEO-STYLE-v4
           path: TV_GOOD_VIDEO_STYLE_v4.apk
           if-no-files-found: error
