@@ -1,0 +1,51 @@
+name: Build Xili MAC STB APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [ mac-stb-player-v1 ]
+    paths:
+      - 'mac_stb_player_v1/**'
+      - '.github/workflows/build-mac-stb.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Reconstruct standalone project
+        run: |
+          cat mac_stb_player_v1/project_chunks/*.b64 | base64 -d > macstb-project.zip
+          rm -rf macstb-source
+          mkdir macstb-source
+          unzip -q macstb-project.zip -d macstb-source
+          test -f macstb-source/settings.gradle.kts
+          test -f macstb-source/app/build.gradle.kts
+      - name: Configure Android SDK
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+      - name: Build APK
+        working-directory: macstb-source
+        run: gradle :app:assembleDebug --stacktrace
+      - name: Rename APK
+        run: cp macstb-source/app/build/outputs/apk/debug/app-debug.apk XILI_MAC_STB_v1.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XILI-MAC-STB-v1
+          path: XILI_MAC_STB_v1.apk
+          if-no-files-found: error
+      - name: Package source
+        run: zip -qr XILI_MAC_STB_v1_SOURCE.zip macstb-source
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XILI-MAC-STB-v1-SOURCE
+          path: XILI_MAC_STB_v1_SOURCE.zip
+          if-no-files-found: error
