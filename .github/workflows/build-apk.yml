@@ -97,7 +97,7 @@ jobs:
         run: |
           cat live_stability_v10/*.b64 | base64 -d | gzip -d > live-stability-v10.patch
           cd source
-          patch -p1 < ../live-stability-v10.patch
+          patch -p2 < ../live-stability-v10.patch
           grep -q '2.8.0-live-stability' app/build.gradle.kts
           grep -q 'livePlaybackUrls' app/src/main/java/com/tvgood/app/net/XtreamClient.java
           grep -q 'liveBufferWatchdog' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
