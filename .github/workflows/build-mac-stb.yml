@@ -32,6 +32,15 @@ jobs:
           grep -q '1.1.0-auto-mac-portal-detect' app/build.gradle.kts
           grep -q 'deviceMac' app/src/main/java/com/xili/macstb/util/SessionStore.java
           grep -q 'discoverPortalLocation' app/src/main/java/com/xili/macstb/net/StalkerClient.java
+      - name: Apply live player stability v3
+        run: |
+          cat mac_stb_player_v1/live_player_v3/*.b64 | base64 -d | gzip -d > live-player-v3.patch
+          cd macstb-source
+          patch -p1 < ../live-player-v3.patch
+          grep -q '1.2.0-live-player-stability' app/build.gradle.kts
+          grep -q 'setUseController(false)' app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
+          grep -q 'setDefaultRequestProperties' app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
+          grep -q 'create_link' app/src/main/java/com/xili/macstb/net/StalkerClient.java
       - name: Configure Android SDK
         run: |
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
@@ -44,16 +53,16 @@ jobs:
         working-directory: macstb-source
         run: gradle :app:assembleDebug --stacktrace
       - name: Rename APK
-        run: cp macstb-source/app/build/outputs/apk/debug/app-debug.apk XILI_MAC_STB_v2.apk
+        run: cp macstb-source/app/build/outputs/apk/debug/app-debug.apk XILI_MAC_STB_v3.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-MAC-STB-v2
-          path: XILI_MAC_STB_v2.apk
+          name: XILI-MAC-STB-v3
+          path: XILI_MAC_STB_v3.apk
           if-no-files-found: error
       - name: Package source
-        run: zip -qr XILI_MAC_STB_v2_SOURCE.zip macstb-source
+        run: zip -qr XILI_MAC_STB_v3_SOURCE.zip macstb-source
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-MAC-STB-v2-SOURCE
-          path: XILI_MAC_STB_v2_SOURCE.zip
+          name: XILI-MAC-STB-v3-SOURCE
+          path: XILI_MAC_STB_v3_SOURCE.zip
           if-no-files-found: error
