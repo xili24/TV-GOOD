@@ -12,6 +12,7 @@ on:
       - 'groups_v7/**'
       - 'vod_v8/**'
       - 'vod_playback_v9/**'
+      - 'live_stability_v10/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -92,6 +93,15 @@ jobs:
           grep -q 'vodPlaybackUrls' app/src/main/java/com/tvgood/app/net/XtreamClient.java
           grep -q 'urlCandidates' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
 
+      - name: Apply live stability v10
+        run: |
+          cat live_stability_v10/*.b64 | base64 -d | gzip -d > live-stability-v10.patch
+          cd source
+          patch -p1 < ../live-stability-v10.patch
+          grep -q '2.8.0-live-stability' app/build.gradle.kts
+          grep -q 'livePlaybackUrls' app/src/main/java/com/tvgood/app/net/XtreamClient.java
+          grep -q 'liveBufferWatchdog' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+
       - name: Apply Xili TV branding
         run: |
           mkdir -p source/app/src/main/res/drawable-nodpi
@@ -106,13 +116,13 @@ jobs:
           test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
           test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
 
-      - name: Package final v9 source
-        run: zip -qr XILI_TV_V9_SOURCE.zip source
+      - name: Package final v10 source
+        run: zip -qr XILI_TV_V10_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-V9-SOURCE
-          path: XILI_TV_V9_SOURCE.zip
+          name: XILI-TV-V10-SOURCE
+          path: XILI_TV_V10_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -136,10 +146,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_VOD_PLAYBACK_v9.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_STABILITY_v10.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-VOD-PLAYBACK-v9
-          path: XILI_TV_VOD_PLAYBACK_v9.apk
+          name: XILI-TV-STABILITY-v10
+          path: XILI_TV_STABILITY_v10.apk
           if-no-files-found: error
