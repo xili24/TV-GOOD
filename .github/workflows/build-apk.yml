@@ -3,7 +3,7 @@ name: Build TV GOOD APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, v10-stability ]
     paths:
       - 'smart_patch/**'
       - 'vertical_patch2/**'
@@ -12,6 +12,7 @@ on:
       - 'groups_v7/**'
       - 'vod_v8/**'
       - 'vod_playback_v9/**'
+      - 'stability_v10/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -106,12 +107,22 @@ jobs:
           test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
           test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
 
-      - name: Package final v9 source
+      - name: Apply stability v10
+        run: |
+          cat stability_v10/*.b64 | base64 -d | gzip -d > stability-v10.patch
+          cd source
+          patch -p1 < ../stability-v10.patch
+          grep -q '2.8.0-stability-preview' app/build.gradle.kts
+          grep -q 'validateAccountAndLoad' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          grep -q 'setEnableDecoderFallback' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
+          grep -q 'Abonimi juaj ka mbaruar' app/src/main/java/com/tvgood/app/ui/LoginActivity.java
+
+      - name: Package final v10 source
         run: zip -qr XILI_TV_V9_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-V9-SOURCE
+          name: XILI-TV-V10-SOURCE
           path: XILI_TV_V9_SOURCE.zip
           if-no-files-found: error
 
@@ -140,6 +151,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-VOD-PLAYBACK-v9
+          name: XILI-TV-STABILITY-v10
           path: XILI_TV_VOD_PLAYBACK_v9.apk
           if-no-files-found: error
