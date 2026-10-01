@@ -34,13 +34,12 @@ jobs:
           grep -q 'discoverPortalLocation' app/src/main/java/com/xili/macstb/net/StalkerClient.java
       - name: Apply live player stability v3
         run: |
-          cat mac_stb_player_v1/live_player_v3/*.b64 | base64 -d | gzip -d > live-player-v3.patch
-          cd macstb-source
-          patch -p1 < ../live-player-v3.patch
-          grep -q '1.2.0-live-player-stability' app/build.gradle.kts
-          grep -q 'setUseController(false)' app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
-          grep -q 'setDefaultRequestProperties' app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
-          grep -q 'create_link' app/src/main/java/com/xili/macstb/net/StalkerClient.java
+          cp mac_stb_player_v1/live_player_v3_src/PlayerActivity.java macstb-source/app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
+          python mac_stb_player_v1/live_player_v3_src/apply_v3.py macstb-source
+          grep -q '1.2.0-live-player-stability' macstb-source/app/build.gradle.kts
+          grep -q 'setUseController(false)' macstb-source/app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
+          grep -q 'setDefaultRequestProperties' macstb-source/app/src/main/java/com/xili/macstb/ui/PlayerActivity.java
+          grep -q 'directFallback' macstb-source/app/src/main/java/com/xili/macstb/net/StalkerClient.java
       - name: Configure Android SDK
         run: |
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
