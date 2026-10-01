@@ -30,7 +30,8 @@ jobs:
 
       - name: Apply safe channel list and Android compatibility
         run: |
-          cp new_player_build/ChannelListActivity_v3.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/ChannelListActivity.java\n          cp new_player_build/PlayerActivity_v8.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/PlayerActivity.java
+          cp new_player_build/ChannelListActivity_v3.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/ChannelListActivity.java
+          cp new_player_build/PlayerActivity_v8.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/PlayerActivity.java
           cp new_player_build/XtreamClient_v6.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/XtreamClient.java
           cp new_player_build/LoginActivity_v6.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/LoginActivity.java
           cp new_player_build/CredentialStore_v6.java unpacked/TV_PLAYER_NEW/app/src/main/java/com/simpleiptv/tv/CredentialStore.java
