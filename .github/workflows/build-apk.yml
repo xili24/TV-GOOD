@@ -11,6 +11,7 @@ on:
       - 'compact_menu_v6/**'
       - 'groups_v7/**'
       - 'vod_v8/**'
+      - 'vod_playback_v9/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -82,6 +83,15 @@ jobs:
           grep -q 'Movies / VOD' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           test -f app/src/main/java/com/tvgood/app/model/VodItem.java
 
+      - name: Apply VOD playback v9
+        run: |
+          cat vod_playback_v9/*.b64 | base64 -d | gzip -d > vod-playback-v9.patch
+          cd source
+          patch -p1 < ../vod-playback-v9.patch
+          grep -q '2.7.0-vod-playback-preview' app/build.gradle.kts
+          grep -q 'vodPlaybackUrls' app/src/main/java/com/tvgood/app/net/XtreamClient.java
+          grep -q 'urlCandidates' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
+
       - name: Apply Xili TV branding
         run: |
           mkdir -p source/app/src/main/res/drawable-nodpi
@@ -96,13 +106,13 @@ jobs:
           test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
           test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
 
-      - name: Package final v8 source
-        run: zip -qr XILI_TV_V8_SOURCE.zip source
+      - name: Package final v9 source
+        run: zip -qr XILI_TV_V9_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-V8-SOURCE
-          path: XILI_TV_V8_SOURCE.zip
+          name: XILI-TV-V9-SOURCE
+          path: XILI_TV_V9_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -126,10 +136,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_VOD_v8.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_VOD_PLAYBACK_v9.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-VOD-v8
-          path: XILI_TV_VOD_v8.apk
+          name: XILI-TV-VOD-PLAYBACK-v9
+          path: XILI_TV_VOD_PLAYBACK_v9.apk
           if-no-files-found: error
