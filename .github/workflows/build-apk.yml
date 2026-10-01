@@ -111,7 +111,7 @@ jobs:
         run: |
           cat stability_v10/*.b64 | base64 -d | gzip -d > stability-v10.patch
           cd source
-          patch -p1 < ../stability-v10.patch
+          patch -p2 < ../stability-v10.patch
           grep -q '2.8.0-stability-preview' app/build.gradle.kts
           grep -q 'validateAccountAndLoad' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           grep -q 'setEnableDecoderFallback' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
