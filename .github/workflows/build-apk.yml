@@ -132,7 +132,7 @@ jobs:
           test -s app/src/main/res/drawable-nodpi/ic_fomo_tv.jpg
           test -s app/src/main/res/drawable-nodpi/fomo_tv_banner.jpg
           test -s app/src/main/res/drawable-nodpi/fomo_splash.jpg
-          find app -name '*.rej' -delete
+          find app \( -name '*.rej' -o -name '*.orig' \) -delete
 
       - name: Package final v12 source
         run: zip -qr FOMO_TV_V12_SOURCE.zip source
