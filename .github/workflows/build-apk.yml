@@ -15,6 +15,7 @@ on:
       - 'live_stability_v10/**'
       - 'account_manager_v11/**'
       - 'fomo_brand_v12/**'
+      - 'vod_posters_v13/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -134,13 +135,23 @@ jobs:
           test -s app/src/main/res/drawable-nodpi/fomo_splash.jpg
           find app \( -name '*.rej' -o -name '*.orig' \) -delete
 
-      - name: Package final v12 source
-        run: zip -qr FOMO_TV_V12_SOURCE.zip source
+      - name: Apply VOD posters and playback v13
+        run: |
+          cat vod_posters_v13/*.b64 | base64 -d | gzip -d > vod-posters-v13.patch
+          cd source
+          patch -p1 < ../vod-posters-v13.patch
+          grep -q '3.1.0-vod-posters' app/build.gradle.kts
+          grep -q 'VOD_MOVIE_PAGE_SIZE = 7' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          grep -q 'loadVodPoster' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          grep -q 'vodBufferWatchdog' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
+
+      - name: Package final v13 source
+        run: zip -qr FOMO_TV_V13_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FOMO-TV-V12-SOURCE
-          path: FOMO_TV_V12_SOURCE.zip
+          name: FOMO-TV-V13-SOURCE
+          path: FOMO_TV_V13_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -164,10 +175,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v12_SPLASH.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v13_VOD_POSTERS.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FOMO-TV-v12-SPLASH
-          path: FOMO_TV_v12_SPLASH.apk
+          name: FOMO-TV-v13-VOD-POSTERS
+          path: FOMO_TV_v13_VOD_POSTERS.apk
           if-no-files-found: error
