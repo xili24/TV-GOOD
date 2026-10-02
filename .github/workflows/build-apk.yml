@@ -14,6 +14,7 @@ on:
       - 'vod_playback_v9/**'
       - 'live_stability_v10/**'
       - 'account_manager_v11/**'
+      - 'fomo_brand_v12/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -113,27 +114,29 @@ jobs:
           grep -q 'showAccountBlocked' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           grep -q 'Change Account' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
 
-      - name: Apply Xili TV branding
+      - name: Apply FOMO TV branding and splash v12
         run: |
-          mkdir -p source/app/src/main/res/drawable-nodpi
-          base64 -d xili_brand/icon.b64 > source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
-          base64 -d xili_brand/banner.b64 > source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
-          sed -i 's#android:icon="@drawable/ic_tvgood"#android:icon="@drawable/ic_xili_tv"#' source/app/src/main/AndroidManifest.xml
-          sed -i 's#android:banner="@drawable/tv_banner"#android:banner="@drawable/xili_tv_banner"#' source/app/src/main/AndroidManifest.xml
-          sed -i 's#android:label="TV GOOD"#android:label="@string/app_name"#' source/app/src/main/AndroidManifest.xml
-          sed -i 's#<string name="app_name">TV GOOD</string>#<string name="app_name">Xili TV</string>#' source/app/src/main/res/values/strings.xml
-          sed -i 's/"TV GOOD"/"Xili TV"/g' source/app/src/main/java/com/tvgood/app/ui/LoginActivity.java
-          grep -q 'Xili TV' source/app/src/main/res/values/strings.xml
-          test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
-          test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
+          cat fomo_brand_v12/patch.b64 | base64 -d | gzip -d > fomo-v12.patch
+          cd source
+          patch -p3 < ../fomo-v12.patch
+          mkdir -p app/src/main/res/drawable-nodpi
+          base64 -d ../fomo_brand_v12/icon.b64 > app/src/main/res/drawable-nodpi/ic_fomo_tv.jpg
+          base64 -d ../fomo_brand_v12/banner.b64 > app/src/main/res/drawable-nodpi/fomo_tv_banner.jpg
+          base64 -d ../fomo_brand_v12/splash.b64 > app/src/main/res/drawable-nodpi/fomo_splash.jpg
+          grep -q '3.0.0-fomo-splash' app/build.gradle.kts
+          grep -q 'FOMO TV' app/src/main/res/values/strings.xml
+          grep -q 'fomo_splash' app/src/main/java/com/tvgood/app/ui/LauncherActivity.java
+          test -s app/src/main/res/drawable-nodpi/ic_fomo_tv.jpg
+          test -s app/src/main/res/drawable-nodpi/fomo_tv_banner.jpg
+          test -s app/src/main/res/drawable-nodpi/fomo_splash.jpg
 
-      - name: Package final v11 source
-        run: zip -qr XILI_TV_V11_SOURCE.zip source
+      - name: Package final v12 source
+        run: zip -qr FOMO_TV_V12_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-V11-SOURCE
-          path: XILI_TV_V11_SOURCE.zip
+          name: FOMO-TV-V12-SOURCE
+          path: FOMO_TV_V12_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -157,10 +160,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_ACCOUNTS_v11.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v12_SPLASH.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-ACCOUNTS-v11
-          path: XILI_TV_ACCOUNTS_v11.apk
+          name: FOMO-TV-v12-SPLASH
+          path: FOMO_TV_v12_SPLASH.apk
           if-no-files-found: error
