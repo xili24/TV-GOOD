@@ -18,6 +18,7 @@ on:
       - 'vod_posters_v13/**'
       - 'blue_accounts_vod_v14/**'
       - 'focus_highlight_v15/**'
+      - 'vod_resolver_v16/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -166,13 +167,23 @@ jobs:
           grep -q 'ROW_FOCUS_BORDER' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           grep -q 'styleChannelRow' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
 
-      - name: Package final v15 source
-        run: zip -qr FOMO_TV_V15_SOURCE.zip source
+      - name: Apply exact VOD resolver v16
+        run: |
+          cat vod_resolver_v16/*.b64 | base64 -d | gzip -d > vod-resolver-v16.patch
+          cd source
+          patch -p3 < ../vod-resolver-v16.patch
+          grep -q '3.4.0-vod-resolver' app/build.gradle.kts
+          grep -q 'resolvedVodPlaybackUrls' app/src/main/java/com/tvgood/app/net/XtreamClient.java
+          grep -q 'findVodUrlInPlaylist' app/src/main/java/com/tvgood/app/net/XtreamClient.java
+          grep -q 'Checking movie stream' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+
+      - name: Package final v16 source
+        run: zip -qr FOMO_TV_V16_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FOMO-TV-V15-SOURCE
-          path: FOMO_TV_V15_SOURCE.zip
+          name: FOMO-TV-V16-SOURCE
+          path: FOMO_TV_V16_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -196,10 +207,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v15_FOCUS.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v16_VOD_RESOLVER.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FOMO-TV-v15-FOCUS
-          path: FOMO_TV_v15_FOCUS.apk
+          name: FOMO-TV-v16-VOD-RESOLVER
+          path: FOMO_TV_v16_VOD_RESOLVER.apk
           if-no-files-found: error
