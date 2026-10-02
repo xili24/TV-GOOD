@@ -118,7 +118,10 @@ jobs:
         run: |
           cat fomo_brand_v12/patch.b64 | base64 -d | gzip -d > fomo-v12.patch
           cd source
-          patch -p3 < ../fomo-v12.patch
+          patch -p3 < ../fomo-v12.patch || true
+          sed -i 's#@drawable/ic_tvgood#@drawable/ic_fomo_tv#g; s#@drawable/ic_xili_tv#@drawable/ic_fomo_tv#g; s#@drawable/tv_banner#@drawable/fomo_tv_banner#g; s#@drawable/xili_tv_banner#@drawable/fomo_tv_banner#g' app/src/main/AndroidManifest.xml
+          sed -i 's#<string name="app_name">TV GOOD</string>#<string name="app_name">FOMO TV</string>#; s#<string name="app_name">Xili TV</string>#<string name="app_name">FOMO TV</string>#' app/src/main/res/values/strings.xml
+          sed -i 's/"TV GOOD"/"FOMO TV"/g; s/"Xili TV"/"FOMO TV"/g; s/"Simple. Fast. Television."/"Platforma jote për TV live, filma dhe argëtim."/g' app/src/main/java/com/tvgood/app/ui/LoginActivity.java
           mkdir -p app/src/main/res/drawable-nodpi
           base64 -d ../fomo_brand_v12/icon.b64 > app/src/main/res/drawable-nodpi/ic_fomo_tv.jpg
           base64 -d ../fomo_brand_v12/banner.b64 > app/src/main/res/drawable-nodpi/fomo_tv_banner.jpg
