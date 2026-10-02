@@ -16,6 +16,7 @@ on:
       - 'account_manager_v11/**'
       - 'fomo_brand_v12/**'
       - 'vod_posters_v13/**'
+      - 'blue_accounts_vod_v14/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -145,13 +146,23 @@ jobs:
           grep -q 'loadVodPoster' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
           grep -q 'vodBufferWatchdog' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
 
-      - name: Package final v13 source
-        run: zip -qr FOMO_TV_V13_SOURCE.zip source
+      - name: Apply FOMO blue/account/VOD v14
+        run: |
+          cat blue_accounts_vod_v14/*.b64 | base64 -d | gzip -d > fomo-v14.patch
+          cd source
+          patch -p3 < ../fomo-v14.patch
+          grep -q '3.2.0-blue-vod-accounts' app/build.gradle.kts
+          grep -q 'Account / Settings' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          grep -q 'Groups / Account' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          grep -q 'trying HLS mode' app/src/main/java/com/tvgood/app/ui/PlayerActivity.java
+
+      - name: Package final v14 source
+        run: zip -qr FOMO_TV_V14_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FOMO-TV-V13-SOURCE
-          path: FOMO_TV_V13_SOURCE.zip
+          name: FOMO-TV-V14-SOURCE
+          path: FOMO_TV_V14_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -175,10 +186,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v13_VOD_POSTERS.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk FOMO_TV_v14_BLUE_ACCOUNTS_VOD.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FOMO-TV-v13-VOD-POSTERS
-          path: FOMO_TV_v13_VOD_POSTERS.apk
+          name: FOMO-TV-v14-BLUE-ACCOUNTS-VOD
+          path: FOMO_TV_v14_BLUE_ACCOUNTS_VOD.apk
           if-no-files-found: error
