@@ -13,6 +13,7 @@ on:
       - 'vod_v8/**'
       - 'vod_playback_v9/**'
       - 'live_stability_v10/**'
+      - 'account_manager_v11/**'
       - 'xili_brand/**'
       - '.github/workflows/build-apk.yml'
 
@@ -102,6 +103,16 @@ jobs:
           grep -q 'livePlaybackUrls' app/src/main/java/com/tvgood/app/net/XtreamClient.java
           grep -q 'liveBufferWatchdog' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
 
+      - name: Apply account manager v11
+        run: |
+          cat account_manager_v11/*.b64 | base64 -d | gzip -d > account-manager-v11.patch
+          cd source
+          patch -p2 < ../account-manager-v11.patch
+          grep -q '2.9.0-account-manager' app/build.gradle.kts
+          grep -q 'SavedAccount' app/src/main/java/com/tvgood/app/util/SessionStore.java
+          grep -q 'showAccountBlocked' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+          grep -q 'Change Account' app/src/main/java/com/tvgood/app/ui/HomeActivity.java
+
       - name: Apply Xili TV branding
         run: |
           mkdir -p source/app/src/main/res/drawable-nodpi
@@ -116,13 +127,13 @@ jobs:
           test -s source/app/src/main/res/drawable-nodpi/ic_xili_tv.png
           test -s source/app/src/main/res/drawable-nodpi/xili_tv_banner.png
 
-      - name: Package final v10 source
-        run: zip -qr XILI_TV_V10_SOURCE.zip source
+      - name: Package final v11 source
+        run: zip -qr XILI_TV_V11_SOURCE.zip source
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-V10-SOURCE
-          path: XILI_TV_V10_SOURCE.zip
+          name: XILI-TV-V11-SOURCE
+          path: XILI_TV_V11_SOURCE.zip
           if-no-files-found: error
 
       - uses: actions/setup-java@v4
@@ -146,10 +157,10 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_STABILITY_v10.apk
+        run: cp source/app/build/outputs/apk/debug/app-debug.apk XILI_TV_ACCOUNTS_v11.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: XILI-TV-STABILITY-v10
-          path: XILI_TV_STABILITY_v10.apk
+          name: XILI-TV-ACCOUNTS-v11
+          path: XILI_TV_ACCOUNTS_v11.apk
           if-no-files-found: error
